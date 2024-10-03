@@ -1,0 +1,276 @@
+---
+title: 'BST 232: Homework 1'
+author: "Phuc Vu"
+date: "09-13-2024"
+output: pdf_document
+extra_dependencies: amsmath
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(
+  tidy = T, results = 'hold', echo = FALSE, warning = FALSE, message = FALSE,
+  out.width = "50%"
+)
+
+# This code cell sets the template format.
+# You can change `out.width` to change the plot size.
+# Note you may need to run install.packages("formatR") for this cell to work.
+
+# You can also load your libraries here, like so:
+library(ggplot2)
+
+```
+
+
+## Question 1
+
+### (a)
+
+
+\begin{align*}
+E(X+Y)&=\int_{-\infty}^\infty\int_{-\infty}^\infty (x+y)f(x,y)dxdy\\
+&= \int_{-\infty}^\infty\int_{-\infty}^\infty xf(x,y)dxdy+ \int_{-\infty}^\infty\int_{-\infty}^\infty yf(x,y)dxdy\\
+&=\int_{-\infty}^\infty x \int_{-\infty}^\infty f(x,y)dydx+ \int_{-\infty}^\infty y \int_{-\infty}^\infty f(x,y)dxdy\\
+&= \int_{-\infty}^\infty x f_X(x)dx+\int_{-\infty}^\infty y f_Y(y)dx\\
+&= E(X)+E(Y) \square
+\end{align*}
+
+
+### (b)
+
+
+\begin{align*}
+E(cX)&=\int_{-\infty}^\infty (cx)f(x)dx\\
+&=c\int_{-\infty}^\infty (x)f(x)dx\\
+&=cE(X)
+\end{align*}
+
+
+### (c)
+
+
+\begin{align*}
+Var(X)&=E((X-E(X))^2)\\
+&= E(X^2-2XE(X)+E(X)^2)\\
+&= E(X^2)-2E(XE(X)) + E(E(X)^2)\\
+\textit{ Note that: } &E(XE(X))=E(X)E(X)=E(X)^2 \textit{ (Result of 1b and } E(X)=c)\\
+&= E(X^2)-2E(X)^2+E(X)^2\\
+&= E(X^2)-E(X)^2 \square
+\end{align*}
+
+### (d)
+
+
+\begin{align*}
+Var(X+c)&= E((X+c)^2)-E(X+c)^2 \textit{ (by 1c)}\\
+&= E(X^2+2Xc +c^2)-(E(X)+c)^2\\
+&= E(X^2)+2E(cX)+c^2-E(X)^2-2cE(X)-c^2  \textit{ (by 1a)}\\
+&= E(X^2)-E(X)^2 \textit{ (Since E(cX)=cE(X))}\\\\
+&= Var(X) \textit{ (by 1c)}\square
+\end{align*}
+
+### (e)
+
+
+\begin{align*}
+Var(cX)&= E((cX)^2)-E(cX)^2 \textit{ (by 1c)}\\
+&= E(c^2X^2)-(cE(X))^2 \textit{ (by 1b)}\\
+&= c^2E(X^2)-c^2E(X)^2 \textit{ (by 1b)}\\
+&= c^2 (E(X^2)-E(X)^2) \\
+&= c^2 Var(X) \textit{ (by 1c)} \square\\
+\end{align*}
+
+
+### (f)
+
+
+\begin{align*}
+E(E(X|Y))&=\int_{-\infty}^\infty E(X|Y=y)f_Y(y)dy\\
+&= \int_{-\infty}^\infty \int_{-\infty}^\infty xf_{X|Y}(x|y)dxf_Y(y)dy\\
+&= \int_{-\infty}^\infty \int_{-\infty}^\infty xf_{X|Y}(x|y)f_Y(y)dxdy\\
+&= \int_{-\infty}^\infty \int_{-\infty}^\infty xf_{X,Y}(x,y)dxdy \textit{ (Since }f_{X|Y}(x|y)f_Y(y) = f_{X,Y}(x,y))\\
+&= \int_{-\infty}^\infty x \int_{-\infty}^\infty f_{X,Y}(x,y)dydx\\
+&= \int_{-\infty}^\infty x f_{X}(x)dx \textit{ (Since }\int_{-\infty}^\infty f_{X,Y}(x,y)dy=f_{X}(x))\\
+&= E(X) \square
+\end{align*}
+
+
+## Question 2
+
+### (a)
+$\hat \mu$ should be about the same as $\mu$ since both 100 and 200 are relatively large sample sizes and $\hat \mu$ is an unbiased estimator of $\mu$
+
+### (b)
+
+
+Since the $Sd(\hat\mu)=\sqrt\frac{\sigma^2}{n}$ and both of our data come from a same population (similar $\sigma^2$), $Sd(\hat \mu)$ from the the colleague's larger data set (larger $n$) should be smaller 
+
+### (c)
+We have the $p$-value$=2Pr(Z>|\frac{\hat\mu-\mu_0}{Sd(\hat\mu)}|)$ (since both samples are large, the use of Z-value instead of T-value hardly make a difference). Since the standard normal distribution is symmetric and centered around 0, with similar $\hat\mu$, the colleague will have smaller $p$-value due to smaller $Sd(\hat\mu)$
+
+## Question 3
+### (a)
+
+```{r}
+source("~/Library/CloudStorage/OneDrive-HarvardUniversity/PhD/Year_1/MethodI/homework/runSimulation.R")
+### Question 3 (a) ###
+set.seed(123)
+q3_a<-runSimulation(mu=5,sigma=10,n=20,M=1,returnRaw = TRUE)
+
+hist(q3_a$rawOutpu[,1,1],
+     main = "Distribution of mean",  # Title of the histogram
+     xlab = "Values",                      # Label for the x-axis
+     ylab = "Frequency",breaks=20)                 # Label for the y-axis 
+hist(q3_a$rawOutpu[,2,1],
+     main = "Distribution of median",  # Title of the histogram
+     xlab = "Values",                      # Label for the x-axis
+     ylab = "Frequency",breaks=20)                 # Label for the y-axis 
+```
+
+We normally call this distribution the sampling distribution
+
+### (b)
+
+```{r}
+### Question 3 (b) ###
+q3_a$simResults
+```
+
+$\hat \mu$ has a lower bias (`r round(q3_a$simResults[,1],3)` versus `r round(q3_a$simResults[,2],3)` ) and lower variance (relative efficiency: `r round(q3_a$simResults[,3],3)`%) compared to $\tilde \mu$
+
+### (c)
+
+```{r, results = "hide"}
+### Question 3 (c) ###
+set.seed(123)
+q3_c<-runSimulation(mu=5,sigma=10,n=20,M=10000,returnRaw = FALSE)
+```
+
+
+```{r}
+hist(q3_c[,1],
+     main = "Distribution of percent bias of sample mean",  # Title of the histogram
+     xlab = "Values",                      # Label for the x-axis
+     ylab = "Frequency",breaks=20)  # Label for the y-axis 
+
+abline(v = q3_a$simResults[,1], col = "red", lwd = 2, lty = 2)
+```
+```{r}
+hist(q3_c[,2],
+     main = "Distribution of percent bias of sample median",  # Title of the histogram
+     xlab = "Values",                      # Label for the x-axis
+     ylab = "Frequency",breaks=20)  # Label for the y-axis 
+
+abline(v = q3_a$simResults[,2], col = "red", lwd = 2, lty = 2)
+```
+```{r}
+hist(q3_c[,3],
+     main = "Distribution of relative efficiency",  # Title of the histogram
+     xlab = "Values",                      # Label for the x-axis
+     ylab = "Frequency",breaks=20)  # Label for the y-axis 
+
+abline(v = q3_a$simResults[,3], col = "red", lwd = 2, lty = 2)
+```
+
+```{r}
+hist(q3_c[,4],
+     main = "Distribution of Relative uncertainty",  # Title of the histogram
+     xlab = "Values",                      # Label for the x-axis
+     ylab = "Frequency",breaks=20)  # Label for the y-axis 
+
+abline(v = q3_a$simResults[,4], col = "red", lwd = 2, lty = 2)
+```
+Have I only conducted a single simulation of size R=100, I would have make a biased conclusion
+
+
+### (d)
+The spread in the histograms can be understood as the variation of the estimator. The wilder the spread the higher variation. 
+```{r}
+### Question 3 (d) ###
+sd_phi_1_3c<-sd(q3_c[,1])
+sd_phi_2_3c<-sd(q3_c[,2])
+sd_phi_3_3c<-sd(q3_c[,3])
+sd_phi_4_3c<-sd(q3_c[,4])
+```
+The Monte Carlo error for the simulations are:
+
+$Sd(\hat\psi_1)=$ `r round(sd_phi_1_3c,3)`
+
+$Sd(\hat\psi_2)=$ `r round(sd_phi_2_3c,3)`
+
+$Sd(\hat\psi_3)=$ `r round(sd_phi_3_3c,3)`
+
+$Sd(\hat\psi_4)=$ `r round(sd_phi_4_3c,3)`
+
+
+### (e)
+
+```{r,results = "hide"}
+### Question 3 (e) ###
+set.seed(123)
+q3_c_500<-runSimulation(mu=5,R=500,sigma=10,n=20,M=10000,returnRaw = FALSE)
+q3_c_1000<-runSimulation(mu=5,R=1000,sigma=10,n=20,M=10000,returnRaw = FALSE)
+```
+```{r}
+sd_phi_1_3c_500<-sd(q3_c_500[,1])
+sd_phi_2_3c_500<-sd(q3_c_500[,2])
+sd_phi_3_3c_500<-sd(q3_c_500[,3])
+sd_phi_4_3c_500<-sd(q3_c_500[,4])
+sd_phi_1_3c_1000<-sd(q3_c_1000[,1])
+sd_phi_2_3c_1000<-sd(q3_c_1000[,2])
+sd_phi_3_3c_1000<-sd(q3_c_1000[,3])
+sd_phi_4_3c_1000<-sd(q3_c_1000[,4])
+```
+
+```{r}
+sd_phi_1<-c(sd_phi_1_3c,sd_phi_1_3c_500,sd_phi_1_3c_1000)
+sd_phi_2<-c(sd_phi_2_3c,sd_phi_2_3c_500,sd_phi_2_3c_1000)
+sd_phi_3<-c(sd_phi_3_3c,sd_phi_3_3c_500,sd_phi_3_3c_1000)
+sd_phi_4<-c(sd_phi_4_3c,sd_phi_4_3c_500,sd_phi_4_3c_1000)
+x<-c(100,500,1000)
+plot(x, sd_phi_1, type = "l", col = "blue", ylim = range(c(sd_phi_1, sd_phi_2, sd_phi_3, sd_phi_4)), 
+     xlab = "R", ylab = "Monte carlo error", main = "Plot of Monte carlo error versus R")
+
+# Add the other lines
+lines(x, sd_phi_2, col = "red")
+lines(x, sd_phi_3, col = "green")
+lines(x, sd_phi_4, col = "purple")
+legend("topright", legend = expression(
+  paste("Sd(", hat(psi)[1], ")"),
+  paste("Sd(", hat(psi)[2], ")"),
+  paste("Sd(", hat(psi)[3], ")"),
+  paste("Sd(", hat(psi)[4], ")")
+), col = c("blue", "red", "green", "purple"), lty = 1)
+```
+```{r}
+x<-1/sqrt(c(100,500,1000))
+plot(x, sd_phi_1, type = "l", col = "blue", ylim = range(c(sd_phi_1, sd_phi_2, sd_phi_3, sd_phi_4)), 
+     xlab = expression(1/sqrt(R)), ylab = "Monte carlo error", main = expression("Plot of Monte Carlo Error versus 1/" ~ sqrt(R)))
+
+# Add the other lines
+lines(x, sd_phi_2, col = "red")
+lines(x, sd_phi_3, col = "green")
+lines(x, sd_phi_4, col = "purple")
+legend("topright", legend = expression(
+  paste("Sd(", hat(psi)[1], ")"),
+  paste("Sd(", hat(psi)[2], ")"),
+  paste("Sd(", hat(psi)[3], ")"),
+  paste("Sd(", hat(psi)[4], ")")
+), col = c("blue", "red", "green", "purple"), lty = 1)
+```
+
+Collectively, The lower the R value, the lower the Monte carlo errors.
+
+## Code
+
+**Important**: The blank R chunk below automatically compiles all of the code chunks you wrote above into one long appendix. Do not remove it or write anything in it (unless you want to delete the code appendix for some reason). Again, ensure that you've labeled each chunk so that the teaching team knows which code pertains to which question.
+
+```{r ref.label=knitr::all_labels(), echo=TRUE, eval=FALSE} 
+
+
+```
+
+
+
+
+

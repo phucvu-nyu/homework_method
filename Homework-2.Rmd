@@ -1,0 +1,307 @@
+---
+title: 'BST 232: Homework 2'
+author: "Phuc Vu"
+date: "09/23/24"
+output: pdf_document
+extra_dependencies: amsmath
+
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(
+  tidy = T, results = 'hold', echo = FALSE, warning = FALSE, message = FALSE,
+  out.width = "50%"
+)
+
+# This code cell sets the template format.
+# You can change `out.width` to change the plot size.
+# Note you may need to run install.packages("formatR") for this cell to work.
+
+# You can also load your libraries here, like so:
+library(ggplot2)
+library(tidyverse)
+```
+
+
+## Question 1 Variance-covariance matrices are symmetric positive semi-definite
+The variance-covariance matrix of a random vector is always symmetric and positive semi-
+definite (PSD). There are various equivalent definitions of PSD, but we will use the one
+below:
+Definition: A $p \times p$ symmetric matrix $\mathbf{A}$ is PSD    $\mathbf{u'Au}\geq 0 \forall \mathbf{u}\in \mathbb{R}^p$.
+Using this definition, show that for a zero-mean random vector $\mathbf{W}\in \mathbb{R}^p$, its covariance
+matrix is PSD. Recall that $Cov(\mathbf{W}) = E((\mathbf{W} - E(\mathbf{W}))(\mathbf{W} - E(\mathbf{W}))')$.
+
+Proof:
+
+$\forall \mathbf{u}\in \mathbb{R}^p$ and zero-mean random vector $\mathbf{W}\in \mathbb{R}^p$, let $u_i=\mathbf{u}_{i1}$ and $w_i=(\mathbf{W} - E(\mathbf{W}))_{i1}$
+We have:
+
+\begin{align*}
+\mathbf{u'}Cov(\mathbf{W})u&=\mathbf{u'}E((\mathbf{W} - E(\mathbf{W}))(\mathbf{W} - E(\mathbf{W}))')u\\
+&= E(u'(\mathbf{W} - E(\mathbf{W}))(\mathbf{W} - E(\mathbf{W}))'u)\\
+&=E(u'(\mathbf{W} - E(\mathbf{W}))(u'(\mathbf{W} - E(\mathbf{W})))')\\
+&=E((\sum_{i=1}^pu_iw_i)(\sum_{i=1}^pu_iw_i)')\\
+&=E((\sum_{i=1}^pu_iw_i)^2)\ge 0\forall \mathbf{u}\in \mathbb{R}^p
+\end{align*}
+
+Therefore, the variance-covariance matrix of a random vector is always positive semi-
+definite.
+
+## Question 2: Orthogonal columns of $\mathbf{X}$
+
+Two $n$-length vectors $\mathbf{b}$ and $\mathbf{c}$ are orthogonal if $\mathbf{b'c}=0$. Show that if the columns of the design matrix $\mathbf{X}$ are mutually orthogonal then the elements of $\hat{\boldsymbol{\beta}}_{OLS}$ are the same as the OLS estimates from separate simple linear regressions of each column of $\mathbf{X}$ onto $\mathbf{y}$.
+
+Proof
+
+Let $\mathbf{x_1},\ldots,\mathbf{x_{p+1}}$ denote the columns of $\mathbf{X}$. Note that $\mathbf{x_1}=({1,...,1})'$. We have $\mathbf{x_i}'\mathbf{x_j}=0\forall i\ne j$.
+
+Let $\mathbf{C=X'X}\in\mathbb{R}^{(p+1)\times (p+1)}$ then:
+\begin{center}
+$\mathbf{C}_{ij}=\mathbf{x_i'x_j}=\begin{cases}0 \text{ if }i\ne j\\ \mathbf{x_i'x_i} \text{ if }i=j\end{cases}$
+\end{center}
+Therefore: $\mathbf{C}=diag(\mathbf{x_1'x_1},\ldots,\mathbf{x_{p+1}'x_{p+1}})\Rightarrow \mathbf{C}^{-1}=diag(1/\mathbf{x_1'x_1},\ldots,1/\mathbf{(x_{p+1}'x_{p+1})})$
+
+
+We have:
+
+
+\begin{align*}
+\hat{\boldsymbol{\beta}}_{OLS}&=\mathbf{[X'X]^{-1}X'y}\\
+&=\mathbf{C}^{-1}\mathbf{X'y}\\
+&=\mathbf{C}^{-1}(\mathbf{x_1'y,\ldots,x_{p+1}'y})\\
+&=diag(1/\mathbf{x_1'x_1},\ldots,1/\mathbf{(x_{p+1}'x_{p+1})})(\mathbf{x_1'y,\ldots,x_{p+1}'y})\\
+&=(\mathbf{\frac{x_1'y}{x_1'x_1},\frac{x_2'y}{x_2'x_2},\ldots,\frac{x_{p+1}'y}{x_{p+1}'x_{p+1}}})'
+\end{align*}
+
+For any given column $\mathbf{x_j},j\ge 2$, we have $n\bar x_j=x_{j1}+...+x_{jn}=\mathbf{x_j'x_1}=0$, therefore $\bar x_j=0\forall j\ge 2$
+Also, in simple linear regression, the coefficient regression is 
+
+\begin{align*}
+\hat\beta_j&=\frac{\sum_{i=1}^n(x_{ji}-\bar x_j)(y_i-\bar y)}{\sum_{i=1}^n(x_{ji}-\bar x_j)^2}\\
+&=\frac{\sum_{i=1}^nx_{ji}(y_i-\bar y)}{\sum_{i=1}^n x_{ji}^2} \text{ (because }\bar x_j=0)\\
+&= \frac{\sum_{i=1}^nx_{ji}y_i-x_{ji}\bar y}{\sum_{i=1}^n x_{ji}^2}\\
+&= \frac{(\sum_{i=1}^nx_{ji}y_i)-n\bar x_j\bar y}{\sum_{i=1}^n x_{ji}^2}\\
+&=\frac{(\sum_{i=1}^nx_{ji}y_i)}{\sum_{i=1}^n x_{ji}^2}\text{ (because }\bar x_j=0)\\
+&=\mathbf{\frac{x_j'y}{x_j'x_j}}
+\end{align*}
+
+
+This is also the $j^{th}$ entry of the $\hat{\boldsymbol{\beta}}_{OLS}$.
+Therefore, if the columns of the design matrix $\mathbf{X}$ are mutually orthogonal then the elements of $\hat{\mathbf{\beta}}_{OLS}$ are the same as the OLS estimates from separate simple linear regressions of each column of $\mathbf{X}$ onto $\mathbf{y}$.
+
+## Question 3: Fitting and interpreting linear models. Consider assessing the association between LDL cholesterol level and body mass index (BMI) in the HERS data. In this problem, we will use log(LDL) as the outcome variable (we will explore how we made this decision when we get to regression diagnostics). Applying the model to all of the HERS data provided on Canvas (hers.csv in the Files >datasets folder):
+```{r}
+# Code for 3a
+her_data<-read.csv("/Users/quangphucvu/Downloads/hers.csv")
+
+```
+
+### a. Fit the simple linear model relating log(LDL) and BMI, and report and interpret the estimated slope $\hat \beta_1$. Is there strong evidence of a linear association between log(LDL) and BMI?
+```{r}
+model3a<-lm(log(LDL)~BMI,data=her_data)
+summary(model3a)
+```
+
+
+$\hat \beta=0.0028$
+
+Interpretation: For every unit increase in BMI, the value of the log (LDL) is expected to increase by 0.0028. There is significant evidence of a linear association between lol(LDL) and BMI with $p$-value of less than 0.002.
+
+
+
+
+### b. Now fit a model for log(LDL) that allows for a quadratic relationship with BMI. Visualize the estimated association between BMI and log(LDL) for BMI values in the range [20,40]. Interpret the results.
+
+```{r}
+model3b<-lm(log(LDL)~BMI+I(BMI^2),data=her_data)
+summary(model3b)
+
+```
+```{r}
+bmi_predict<-seq(20,40,length.out=1000)
+her_predict<-data.frame(BMI=bmi_predict)
+logLDL_predict<-predict(model3b,newdata = her_predict)
+plot(bmi_predict,logLDL_predict)
+```
+
+
+At value $x$ of BMI, an increase unit in BMI is associated with a change of $0.016-2*0.0002x+0.0002^2$ in log(LDL). At small value, an increase unit in BMI is associated with a higher expected value of log(LDL). Nevertheless, at a high value (>35), an increase in BMI is associated with a lower expected value of log(LDL).
+
+### c. Construct a categorical version of the BMI variable following the CDC’s BMI categories shown below. Specify and fit a linear model to assess the association between log(LDL) and the BMI categories, and interpret the results.
+
+![](/Users/quangphucvu/Desktop/Screen Shot 2024-09-18 at 8.39.58 PM.png)
+
+```{r}
+# Code for 3c
+BMI_cdc<-cut(her_data$BMI,breaks=c(-Inf,18.5,25,30,Inf),include.lowest = TRUE,labels = c("Underweight","Healthy Weight","Overweight","Obesity"))
+her_data$BMI_cdc<-BMI_cdc
+# table(BMI_cdc)
+model3c<-lm(log(LDL)~BMI_cdc,data = her_data)
+knitr::kable(summary(model3c)$coefficients)
+```
+Compared to people who are underweight BMI, people with Healthy weight BMI are expected to have a 0.003 higher lol(LDL). 
+
+Compared to people who are underweight BMI, people with Overweight BMI are expected to have a 0.025 higher lol(LDL). 
+
+Compared to people who are underweight BMI, people with Obesity BMI are expected to have a 0.04 higher lol(LDL). 
+
+
+d. Fit a model for log(LDL) that allows for the association between the categorical BMI variable and log(LDL) to differ for those who do and do not take statins. Interpret the results (you may use visualizations to help).
+
+```{r}
+# Code for 3d
+model3d<-lm(log(LDL)~BMI_cdc*statins,data = her_data)
+knitr::kable(summary(model3d)$coefficients)
+```
+
+```{r}
+table_3d<-as.data.frame(summary(model3d)$coefficients)
+table_3d$have_statin<-grepl("statin", rownames(table_3d), ignore.case = TRUE)
+table_3d$predict<-table_3d$Estimate +(table_3d$have_statin)*rep(table_3d$Estimate[1:4])
+plot_data<-table_3d[-c(1,5),]
+plot_data$BMI_type<-rep(c("Healthy","Overweight","Obesity"),2)
+ggplot(plot_data, aes(x = BMI_type, y = predict, fill = have_statin)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.9)) +
+  labs(title = "Predicted Value of Log(LDL) Compared To Underweight",
+       x = "BMI type",
+       y = "Predicted Log(LDL)") +
+  theme_minimal()
+```
+
+People with healthy BMI is expected to have higher 0.01 log(LDL) compared to people with underweight BMI among people who do not use statins while that of people who do use statin is 0.04. Similarly, people with Obesity BMI is expected to have higher 0.066 log(LDL) compared to people with underweight BMI among people who do not use statins while that of people who do use statin is 0.036. On the other hand, people with Overweight BMI is expected to have higher 0.044 log(LDL) compared to people with underweight BMI among people who do not use statins while that of people who do use statin is 0.050.  Nevertheless, the interaction terms are not significant meaning there is not significant different association between the categorical BMI variable and log(LDL) among for those who do and do not take statins.
+
+## Question 4: Investigating the impacts of model misspecification In this problem, we will investigate the implications and impacts of misspecification of the systematic component of the linear model. Suppose interest lies in the relationship between a continuous outcome $Y$ and a single continuous exposure variable $x$. Consider
+the following three models:
+Model 1 $Y_i = \beta_0 + \beta_1x_i + \beta_2x_i^2 + \beta_3x_i^3+\varepsilon_i$
+Model 2 $Y_i = \alpha_0 + \alpha_1x_i +\varepsilon_i$
+Model 3 $Y_i = \gamma_0 + \gamma_1x^{*}_{i2}+\ldots+  \gamma_{K-1}x^{*}_{iK}+\varepsilon_i$
+where $\varepsilon_i \sim N(0,\sigma^2)$ and $\{x_{i1}^*,\ldots,x_{iK}^*\}$ is a collection of K indicator/dummy variables, each defined by
+\begin{center}
+$x_{ik}=\begin{cases}1 \text{    if  } x_i\in [c_k,c_{k+1})\\ 0 \text{ otherwise}\end{cases}$
+\end{center}
+for the partition $\{c_1,\ldots,c_{K+1}\}$ of the real line, where $c_1\equiv-\infty$ and $c_{K+1} \equiv \infty$.
+Suppose Model 1 is the correct model and yet we fit Model 2 or Model 3. Despite Model 2 being misspecified, the OLS estimate of $\boldsymbol{\alpha}$ converges to some value, say $\boldsymbol{\alpha^*}$. That is, $\boldsymbol{\hat{\alpha}\rightarrow \alpha^*}$ as $n\rightarrow \infty$. Similarly, despite Model 3 being misspecified, we have $\boldsymbol{\hat{\gamma}\rightarrow \gamma^*}$ as $n\rightarrow \infty$ for some value $\boldsymbol{\gamma^*}$
+
+## (a) We can investigate the ‘true’ value of 
+$\boldsymbol{\alpha^*}$ and $\boldsymbol{\gamma^*}$ empirically by simulating a large dataset under the true model and examining the estimates from the misspecified model. Intuitively, we are simulating asymptotia by setting $n$ to be large. For each of the following scenarios, simulate a single sample of size $n=1,000,000$ from Model 1 with $\sigma^2=4$ as the error variance. Then fit Models 2 and 3 and report the values of $\boldsymbol{\hat\alpha}$ and $\boldsymbol{\hat\gamma}$:
+
+```{r}
+# code for 4a
+# set up data
+set.seed(2024-09-19)
+n<-1e6
+x_i <- rnorm(n, 0, 1)
+x_i_category<-cut(x_i,breaks=c(-Inf,-3,-2,-1,0,1,2,3,Inf),include.lowest = TRUE,labels = c("x1","x2","x3","x4","x5","x6","x7","x8"))
+epsilon_i<-rnorm(n,0,2)
+Y_1<-0.2*x_i+0.2*x_i^2+0.1*x_i^3+epsilon_i
+Y_2<-0.2*x_i+0.2*x_i^2-0.1*x_i^3+epsilon_i
+data<-data.frame(Y_1 = Y_1,
+           Y_2 = Y_2,
+           x_i = x_i,
+           x_i_cat<-as.factor(x_i_category))
+
+ref<-"x1"
+formula_1<-"x_i+I(x_i^2)+I(x_i^3)"
+formula_2<-"x_i"
+formula_3<-"relevel(x_i_cat,ref=ref)"
+
+```
+
+(i) $\boldsymbol{\beta} = (0, 0.2, 0.2, 0.1)$ and $x \sim Normal(0, 1)$
+
+```{r}
+#code for 4a(i)
+model_3a_2_i<-lm(as.formula(paste0("Y_1~",formula_2)))
+model_3a_3_i<-lm(as.formula(paste0("Y_1~",formula_3)))
+```
+```{r}
+result_3a_2_i<-summary(model_3a_2_i)$coefficients
+knitr::kable(result_3a_2_i)
+```
+
+$$\boldsymbol{\hat{\alpha}} = (\alpha_0,\alpha_1)' =  ( `r round(result_3a_2_i[1,1],4)` , `r round(result_3a_2_i[2,1],4)` )$$
+
+```{r}
+result_3a_3_i<-summary(model_3a_3_i)$coefficients
+knitr::kable(result_3a_3_i)
+```
+
+$$\boldsymbol{\hat{\gamma}} = (\gamma_0,\ldots,\gamma_8)' = ( `r round(result_3a_3_i[1,1],4)` , `r round(result_3a_3_i[2,1],4)` , `r round(result_3a_3_i[3,1],4)` , `r round(result_3a_3_i[4,1],4)` , `r round(result_3a_3_i[5,1],4)` , `r round(result_3a_3_i[6,1],4)` , `r round(result_3a_3_i[7,1],4)` , `r round(result_3a_3_i[8,1],4)` ) $$
+
+(ii) $\boldsymbol{\beta} = (0, 0.2, 0.2, -0.1)$ and $x \sim Normal(0, 1)$
+Note: For estimation based on Model 3 use the following partition for x:
+
+$\{c_1, c_2, . . . , c_K , c_{K+1}\} = \{-\infty, -3, -2, -1, 0, 1, 2, 3, \infty\}$
+
+```{r}
+#code for 4a(ii)
+model_3a_2_ii<-lm(as.formula(paste0("Y_2~",formula_2)))
+model_3a_3_ii<-lm(as.formula(paste0("Y_2~",formula_3)))
+```
+```{r}
+result_3a_2_ii<-summary(model_3a_2_ii)$coefficients
+knitr::kable(result_3a_2_ii)
+```
+
+$$\boldsymbol{\hat{\alpha}} = (\alpha_0,\alpha_1)' = ( `r round(result_3a_2_ii[1,1],4)` , `r round(result_3a_2_ii[2,1],4)` ) $$
+
+```{r}
+result_3a_3_ii<-summary(model_3a_3_ii)$coefficients
+knitr::kable(result_3a_3_ii)
+```
+
+$$\boldsymbol{\hat{\gamma}}  = (\gamma_0,\ldots,\gamma_8)' = ( `r round(result_3a_3_ii[1,1],4)` , `r round(result_3a_3_ii[2,1],4)` , `r round(result_3a_3_ii[3,1],4)` , `r round(result_3a_3_ii[4,1],4)` , `r round(result_3a_3_ii[5,1],4)` , `r round(result_3a_3_ii[6,1],4)` , `r round(result_3a_3_ii[7,1],4)` , `r round(result_3a_3_ii[8,1],4)` ) $$
+
+
+## (b) For a range of values of $x \in (-3, 3)$, compute the true values of $E[Y\mid x]$ under each of the following scenarios for Model 1:
+```{r}
+# code for 4b
+x<-seq(-3,3,length.out=1000)
+E_Y_1<-0.2*x+0.2*x^2+0.1*x^3
+E_Y_2<-0.2*x+0.2*x^2-0.1*x^3
+x_i_cat_test<-cut(x,breaks=c(-Inf,-3,-2,-1,0,1,2,3,Inf),include.lowest = TRUE,labels = c("x1","x2","x3","x4","x5","x6","x7","x8"))
+data_predict<-data.frame(
+           x_i = x,
+           x_i_cat<-as.factor(x_i_cat_test))
+hat_E_Y_2_i<-predict(model_3a_2_i,newdata = data_predict)
+hat_E_Y_3_i<-predict(model_3a_3_i,newdata = data_predict)
+hat_E_Y_2_ii<-predict(model_3a_2_ii,newdata = data_predict)
+hat_E_Y_3_ii<-predict(model_3a_3_ii,newdata = data_predict)
+```
+
+(i) $\boldsymbol{\beta} = (0, 0.2, 0.2, 0.1)$
+
+```{r}
+plot(x, E_Y_1, main = "Observed values versus true value of E(Y|X)",
+     xlab = "x_i", ylab = "Observed Values", pch = 19)
+lines(x,hat_E_Y_2_i, col = "blue", lwd = 2)
+lines(x,hat_E_Y_3_i, col = "red", lwd = 2)
+legend("topright", legend = c("True E[Y|X]", "Model 2: E[Y|X]", "Model 3: E[Y|X]"),
+       col = c("black", "blue", "red"), lwd = 2, pch = c(19, NA, NA))
+```
+
+(ii) $\boldsymbol{\beta} = (0, 0.2, 0.2, -0.1)$
+
+```{r}
+plot(x, E_Y_2, main = "observed values versus true value of E(Y|X)",
+     xlab = "x_i", ylab = "Observed Values", pch = 19)
+lines(x,hat_E_Y_2_ii, col = "blue", lwd = 2)
+lines(x,hat_E_Y_3_ii, col = "red", lwd = 2)
+legend("topright", legend = c("True E[Y|X]", "Model 2: E[Y|X]", "Model 3: E[Y|X]"),
+       col = c("black", "blue", "red"), lwd = 2, pch = c(19, NA, NA))
+```
+
+Plot the values versus x on separate figures (join the points to provide a smooth representation). Superimpose the values of $\hat E[Y\mid x]$ based on the approximate models
+you obtained in part (a) on the appropriate figure. You should end up with two figures, each with three lines.
+
+## (c) Suppose in a real data setting, where you don’t know the true form of $E[Y\mid x]$ you fit both models (2) and (3) on your data and find that your plots of $\hat E[Y\mid x]$ from the two model fits display quite different trends. What might you conclude?
+
+Since the step model (model 3) allow for flexibility of the model and capture the mean of effect of intervals of x on y, if I find the two models fits display quite different trends, I will add higher order term of x or transform the variable x to allow for more non-linear relations.
+
+## Code
+
+
+```{r ref.label=knitr::all_labels(), echo=TRUE, eval=FALSE} 
+
+
+```
